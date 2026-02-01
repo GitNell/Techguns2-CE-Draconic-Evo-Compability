@@ -24,7 +24,6 @@ public class TGPlayerInventory implements IInventory {
     public static final int SLOTS_AMMO_END = 14;
     private static final String name = "TechgunsPlayerInventory";
     public NonNullList<ItemStack> inventory = NonNullList.withSize(NUMSLOTS, ItemStack.EMPTY);// new
-    // ItemStack[NUMSLOTS];
 
     public boolean dirty = false;
     public EntityPlayer player;
@@ -35,15 +34,11 @@ public class TGPlayerInventory implements IInventory {
 
 
     public void saveNBTData(NBTTagCompound tags) {
-        // NBTTagList nbttaglist = new NBTTagList();
         ItemStackHelper.saveAllItems(tags, this.inventory);
-
-        // tags.setTag(name, nbttaglist);
     }
 
     public void loadNBTData(NBTTagCompound tags) {
-        // NBTTagList nbttaglist = tags.getTagList(name, 10);
-        this.inventory.clear(); // = NonNullList.<ItemStack>withSize(NUMSLOTS, ItemStack.EMPTY);
+        this.inventory.clear();
 
         ItemStackHelper.loadAllItems(tags, this.inventory);
     }
@@ -69,12 +64,14 @@ public class TGPlayerInventory implements IInventory {
     public void setInventorySlotContents(int slotid, ItemStack itemstack) {
         this.inventory.set(slotid, itemstack);
 
-        if (slotid == SLOT_FACE) {
-            player.getDataManager().set(TGExtendedPlayer.DATA_FACE_SLOT, itemstack);
-        } else if (slotid == SLOT_BACK) {
-            player.getDataManager().set(TGExtendedPlayer.DATA_BACK_SLOT, itemstack);
-        } else if (slotid == SLOT_HAND) {
-            player.getDataManager().set(TGExtendedPlayer.DATA_HAND_SLOT, itemstack);
+        if (player != null) {
+            if (slotid == SLOT_FACE) {
+                player.getDataManager().set(TGExtendedPlayer.DATA_FACE_SLOT, itemstack);
+            } else if (slotid == SLOT_BACK) {
+                player.getDataManager().set(TGExtendedPlayer.DATA_BACK_SLOT, itemstack);
+            } else if (slotid == SLOT_HAND) {
+                player.getDataManager().set(TGExtendedPlayer.DATA_HAND_SLOT, itemstack);
+            }
         }
 
         this.markDirty();
@@ -87,7 +84,6 @@ public class TGPlayerInventory implements IInventory {
 
     @Override
     public void markDirty() {
-        // System.out.println("Marked inv as dirty");
         this.dirty = true;
     }
 
@@ -162,7 +158,7 @@ public class TGPlayerInventory implements IInventory {
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        if (this.player.isDead) {
+        if (this.player == null || this.player.isDead) {
             return false;
         } else {
             return player.getDistanceSq(this.player) <= 64.0D;

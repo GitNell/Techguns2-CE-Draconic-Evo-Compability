@@ -91,16 +91,17 @@ public class TGExtendedPlayer implements ITGExtendedPlayer {
 	 * used by client only, but saved serverside
 	 */
 	public boolean showTGHudElements=true;
-	
+
 	public TGExtendedPlayer(EntityPlayer entity) {
 		this.entity = entity;
 		this.tg_inventory = new TGPlayerInventory(entity);
-		entity.getDataManager().register(DATA_FACE_SLOT, ItemStack.EMPTY);
-		entity.getDataManager().register(DATA_BACK_SLOT, ItemStack.EMPTY);
-		entity.getDataManager().register(DATA_HAND_SLOT, ItemStack.EMPTY);
-		
-		entity.getDataManager().register(DATA_FLAG_CHARGING_WEAPON, false);
-        entity.getDataManager().register(DATA_UNLOCK_CYBERNETIC_PARTS, false);
+		if (entity != null) {
+			entity.getDataManager().register(DATA_FACE_SLOT, ItemStack.EMPTY);
+			entity.getDataManager().register(DATA_BACK_SLOT, ItemStack.EMPTY);
+			entity.getDataManager().register(DATA_HAND_SLOT, ItemStack.EMPTY);
+			entity.getDataManager().register(DATA_FLAG_CHARGING_WEAPON, false);
+			entity.getDataManager().register(DATA_UNLOCK_CYBERNETIC_PARTS, false);
+		}
 	}
 	
 	@Override

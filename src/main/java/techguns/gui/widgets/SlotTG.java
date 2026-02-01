@@ -42,23 +42,15 @@ public class SlotTG extends Slot {
 
     @Override
     public String getSlotTexture() {
-        switch (type) {
-            case AMMOSLOT:
-                return AMMOSLOT_TEX.toString();
-            case BACKSLOT:
-                return BACKSLOT_TEX.toString();
-            case FACESLOT:
-                return FACESLOT_TEX.toString();
-            case FOODSLOT:
-                return FOODSLOT_TEX.toString();
-            case HANDSLOT:
-                return HANDSLOT_TEX.toString();
-            case HEALSLOT:
-                return HEALSLOT_TEX.toString();
-            default:
-                break;
-        }
-        return super.getSlotTexture();
+        return switch (type) {
+            case AMMOSLOT -> AMMOSLOT_TEX.toString();
+            case BACKSLOT -> BACKSLOT_TEX.toString();
+            case FACESLOT -> FACESLOT_TEX.toString();
+            case FOODSLOT -> FOODSLOT_TEX.toString();
+            case HANDSLOT -> HANDSLOT_TEX.toString();
+            case HEALSLOT -> HEALSLOT_TEX.toString();
+            default -> super.getSlotTexture();
+        };
     }
 
 

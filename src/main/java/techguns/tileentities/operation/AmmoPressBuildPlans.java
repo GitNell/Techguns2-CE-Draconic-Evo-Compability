@@ -18,9 +18,14 @@ public class AmmoPressBuildPlans {
     public static ArrayList<ItemStack> metal2 = new ArrayList<>();
     public static ArrayList<ItemStack> powder = new ArrayList<>();
 
+    public static ArrayList<String> metal1_oreNames = new ArrayList<>();
+    public static ArrayList<String> metal2_oreNames = new ArrayList<>();
+    public static ArrayList<String> powder_oreNames = new ArrayList<>();
+
     public static void init(ArrayList<String> metal1_names, ArrayList<String> metal2_names, ArrayList<String> powder_names) {
 
         if (metal1_names != null) {
+            metal1_oreNames.addAll(metal1_names);
             for (String name : metal1_names) {
                 NonNullList<ItemStack> ores = OreDictionary.getOres(name);
                 if (!ores.isEmpty()) {
@@ -30,6 +35,7 @@ public class AmmoPressBuildPlans {
         }
 
         if (metal2_names != null) {
+            metal2_oreNames.addAll(metal2_names);
             for (String name : metal2_names) {
                 NonNullList<ItemStack> ores = OreDictionary.getOres(name);
                 if (!ores.isEmpty()) {
@@ -43,6 +49,7 @@ public class AmmoPressBuildPlans {
         }
 
         if (powder_names != null) {
+            powder_oreNames.addAll(powder_names);
             for (String name : powder_names) {
                 NonNullList<ItemStack> ores = OreDictionary.getOres(name);
                 if (!ores.isEmpty()) {
@@ -53,22 +60,25 @@ public class AmmoPressBuildPlans {
 
     }
 
-    public static boolean isInList(ItemStack it, ArrayList<ItemStack> list) {
-        boolean valid = false;
-        for (ItemStack itemStack : list) {
-            if (OreDictionary.itemMatches(itemStack, it, false)) {
-                valid = true;
-                break;
+    public static boolean isInList(ItemStack it, ArrayList<String> oreNames) {
+        if (it.isEmpty()) return false;
+        int[] itemOreIds = OreDictionary.getOreIDs(it);
+        for (String oreName : oreNames) {
+            int oreId = OreDictionary.getOreID(oreName);
+            for (int itemOreId : itemOreIds) {
+                if (itemOreId == oreId) {
+                    return true;
+                }
             }
         }
-        return valid;
+        return false;
     }
 
     public static boolean isValidFor(ItemStack input, int slot) {
         return switch (slot) {
-            case AmmoPressTileEnt.SLOT_METAL1 -> isInList(input, metal1);
-            case AmmoPressTileEnt.SLOT_METAL2 -> isInList(input, metal2);
-            case AmmoPressTileEnt.SLOT_POWDER -> isInList(input, powder);
+            case AmmoPressTileEnt.SLOT_METAL1 -> isInList(input, metal1_oreNames);
+            case AmmoPressTileEnt.SLOT_METAL2 -> isInList(input, metal2_oreNames);
+            case AmmoPressTileEnt.SLOT_POWDER -> isInList(input, powder_oreNames);
             default -> false;
         };
     }
@@ -124,13 +134,12 @@ public class AmmoPressBuildPlans {
             List<List<ItemStack>> outputs = new ArrayList<>();
             ArrayList<ItemStack> output = new ArrayList<>();
 
-            ItemStack stack = ItemStack.EMPTY;
-            stack = switch (plan) {
+            ItemStack stack = switch (plan) {
                 case 0 -> new ItemStack(TGItems.PISTOL_ROUNDS.getItem(), AMMOUNT_PISTOL, TGItems.PISTOL_ROUNDS.getItemDamage());
                 case 1 -> new ItemStack(TGItems.SHOTGUN_ROUNDS.getItem(), AMMOUNT_SHOTGUN, TGItems.SHOTGUN_ROUNDS.getItemDamage());
                 case 2 -> new ItemStack(TGItems.RIFLE_ROUNDS.getItem(), AMMOUNT_RIFLE, TGItems.RIFLE_ROUNDS.getItemDamage());
                 case 3 -> new ItemStack(TGItems.SNIPER_ROUNDS.getItem(), AMMOUNT_SNIPER, TGItems.SNIPER_ROUNDS.getItemDamage());
-                default -> stack;
+                default -> ItemStack.EMPTY;
             };
             output.add(stack);
             outputs.add(output);

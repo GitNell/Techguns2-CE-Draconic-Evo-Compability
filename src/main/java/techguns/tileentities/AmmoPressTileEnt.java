@@ -47,9 +47,9 @@ public class AmmoPressTileEnt extends BasicMachineTileEnt {
             @Override
             protected boolean allowItemInSlot(int slot, ItemStack stack) {
                 return switch (slot) {
-                    case SLOT_METAL1 -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.metal1);
-                    case SLOT_METAL2 -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.metal2);
-                    case SLOT_POWDER -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.powder);
+                    case SLOT_METAL1 -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.metal1_oreNames);
+                    case SLOT_METAL2 -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.metal2_oreNames);
+                    case SLOT_POWDER -> AmmoPressBuildPlans.isInList(stack, AmmoPressBuildPlans.powder_oreNames);
                     case SLOT_OUTPUT -> false;
                     case SLOT_UPGRADE -> TGItems.isMachineUpgrade(stack);
                     default -> true;
@@ -136,10 +136,10 @@ public class AmmoPressTileEnt extends BasicMachineTileEnt {
 
             int maxStack = this.getMaxMachineUpgradeMultiplier(SLOT_UPGRADE);
 
-            int i;
+            int baseCount = output.getCount();
             int multiplier = 1;
-            for (i = maxStack; i > 1; --i) {
-                output.setCount(output.getCount() * i);
+            for (int i = maxStack; i > 1; --i) {
+                output.setCount(baseCount * i);
                 if (canOutput(output, SLOT_OUTPUT)) {
                     if (this.inputMetal1.canConsume(i) && this.inputMetal2.canConsume(2 * i) && this.inputPowder.canConsume(i)) {
                         multiplier = i;
@@ -147,6 +147,8 @@ public class AmmoPressTileEnt extends BasicMachineTileEnt {
                     }
                 }
             }
+
+            output.setCount(baseCount);
             ItemStack metal1 = this.inputMetal1.getTypeWithSize(1);
             ItemStack metal2 = this.inputMetal2.getTypeWithSize(2);
             ItemStack powder = this.inputPowder.getTypeWithSize(1);

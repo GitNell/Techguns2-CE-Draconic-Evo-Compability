@@ -21,7 +21,7 @@ public class AmmoPressContainer extends BasicMachineContainer {
     public static final int SLOTS_INPUT_Y = 17;
     public static final int SLOT_OUTPUT_X = 120;
     public static final int SLOTS_OUTPUT_Y = 60;
-    public static final int SLOT_UPGRADE_X = 152;
+    public static final int SLOT_UPGRADE_X = 153;
     protected AmmoPressTileEnt tile;
     private byte lastBuildPlan = 0;
 
@@ -38,7 +38,7 @@ public class AmmoPressContainer extends BasicMachineContainer {
             this.addSlotToContainer(new SlotAmmoPressInput(handler, AmmoPressTileEnt.SLOT_POWDER, SLOT_POWDER_X, SLOTS_INPUT_Y, SlotFabricator.FABRICATOR_SLOTTEX_POWDER));
 
             this.addSlotToContainer(new SlotItemHandlerOutput(inventory, AmmoPressTileEnt.SLOT_OUTPUT, SLOT_OUTPUT_X, SLOTS_OUTPUT_Y));
-            this.addSlotToContainer(new SlotMachineUpgrade(handler, AmmoPressTileEnt.SLOT_UPGRADE, SLOT_UPGRADE_X, SLOTS_OUTPUT_Y));
+            this.addSlotToContainer(new SlotMachineUpgrade(handler, AmmoPressTileEnt.SLOT_UPGRADE, SLOT_UPGRADE_X, SLOTS_OUTPUT_Y + 1));
         }
 
         this.playerInv(player, 8, 116);
@@ -77,7 +77,6 @@ public class AmmoPressContainer extends BasicMachineContainer {
             if (!stack.isEmpty()) {
 
                 if (id <= AmmoPressTileEnt.SLOT_UPGRADE) {
-                    //PRESSED IN MACHINE GUI
                     if (!this.mergeItemStack(stack1, AmmoPressTileEnt.SLOT_UPGRADE + 1, AmmoPressTileEnt.SLOT_UPGRADE + 37, false)) {
                         return ItemStack.EMPTY;
                     }
@@ -85,7 +84,6 @@ public class AmmoPressContainer extends BasicMachineContainer {
                 } else if (id < AmmoPressTileEnt.SLOT_UPGRADE + 37) {
 
                     int validslot = AmmoPressTileEnt.getValidSlotForItemInMachine(stack1);
-                    //System.out.println("put it in slot"+validslot);
                     if (validslot >= 0) {
 
                         if (!this.mergeItemStack(stack1, validslot, validslot + 1, false)) {

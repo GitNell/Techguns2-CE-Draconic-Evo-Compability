@@ -246,7 +246,7 @@ public class GenericGunMeleeCharge extends GenericGunCharge implements IGenericG
 
     public EnumFacing getSideHitMining(World world, EntityPlayer player) {
         RayTraceResult result = this.rayTrace(world, player, false);
-        if (result.typeOfHit == Type.BLOCK) {
+        if (result != null && result.typeOfHit == Type.BLOCK) {
             return result.sideHit;
         }
         return null;

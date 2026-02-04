@@ -24,6 +24,7 @@ public class AmmoPressGui extends PoweredTileEntGui {
         this.tileent = tileent;
         this.tex = texture;
         this.ySize = 198;
+        this.upgradeSlotY = 58;
     }
 
     @Override

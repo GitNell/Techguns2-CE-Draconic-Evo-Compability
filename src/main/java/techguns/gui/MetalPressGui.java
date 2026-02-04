@@ -36,6 +36,8 @@ public class MetalPressGui extends PoweredTileEntGui {
         this.tile = tileent;
         this.tex = texture;
         this.ySize = 198;
+        this.upgradeSlotX = 150;
+        this.upgradeSlotY = 58;
         this.lastHasSteamUpgrade = tileent.hasSteamUpgrade();
         this.xSize = this.lastHasSteamUpgrade ? 201 : 176;
     }

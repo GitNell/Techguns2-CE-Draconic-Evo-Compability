@@ -361,32 +361,32 @@ public class TGEventHandler {
 	        event.setDistance(event.getDistance() * reduction);
 	    }  
 	}
-	
-	@SubscribeEvent(priority=EventPriority.HIGH)
-	public static void onBreakEventHigh(BreakSpeed event){
+
+	@SubscribeEvent(priority = EventPriority.HIGH)
+	public static void onBreakEventHigh(BreakSpeed event) {
 		EntityPlayer ply = event.getEntityPlayer();
 		ItemStack item = ply.getHeldItemMainhand();
-		if(!item.isEmpty() && item.getItem() instanceof GenericGunMeleeCharge) {
+		if (!item.isEmpty() && item.getItem() instanceof GenericGunMeleeCharge) {
 			GenericGunMeleeCharge g = (GenericGunMeleeCharge) item.getItem();
-			if(g.getMiningRadius(item)>0) {	
+			if (g.getMiningRadius(item) > 0) {
 				EnumFacing sidehit = g.getSideHitMining(ply.world, ply);
-				
-				if (sidehit!=null) {
+
+				if (sidehit != null) {
 					IBlockState state = event.getState();
 					float mainHardness = state.getBlockHardness(ply.world, event.getPos());
-					
-					List<BlockPos> blocks = BlockUtils.getBlockPlaneAroundAxisForMining(ply.world,ply, event.getPos(), sidehit.getAxis(), g.getMiningRadius(item), false, g, item);
+
+					List<BlockPos> blocks = BlockUtils.getBlockPlaneAroundAxisForMining(ply.world, ply, event.getPos(), sidehit.getAxis(), g.getMiningRadius(item), false, g, item);
 					float maxHardness = 0f;
-					for (BlockPos p: blocks) {
+					for (BlockPos p : blocks) {
 						IBlockState s = ply.world.getBlockState(p);
 						float h = s.getBlockHardness(ply.world, p);
-						if(h>maxHardness) {
-							maxHardness=h;
+						if (h > maxHardness) {
+							maxHardness = h;
 						}
 					}
-					
-					if (maxHardness>mainHardness) {
-						event.setNewSpeed(event.getNewSpeed()*mainHardness/maxHardness);
+
+					if (maxHardness > mainHardness) {
+						event.setNewSpeed(event.getNewSpeed() * mainHardness / maxHardness);
 					}
 				}
 			}

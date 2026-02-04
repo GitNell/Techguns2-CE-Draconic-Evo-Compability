@@ -38,7 +38,7 @@ public class AmmoPressContainer extends BasicMachineContainer {
             this.addSlotToContainer(new SlotAmmoPressInput(handler, AmmoPressTileEnt.SLOT_POWDER, SLOT_POWDER_X, SLOTS_INPUT_Y, SlotFabricator.FABRICATOR_SLOTTEX_POWDER));
 
             this.addSlotToContainer(new SlotItemHandlerOutput(inventory, AmmoPressTileEnt.SLOT_OUTPUT, SLOT_OUTPUT_X, SLOTS_OUTPUT_Y));
-            this.addSlotToContainer(new SlotMachineUpgrade(handler, AmmoPressTileEnt.SLOT_UPGRADE, SLOT_UPGRADE_X, SLOTS_OUTPUT_Y + 1));
+            this.addSlotToContainer(new SlotMachineUpgrade(handler, AmmoPressTileEnt.SLOT_UPGRADE, SLOT_UPGRADE_X, SLOTS_OUTPUT_Y));
         }
 
         this.playerInv(player, 8, 116);

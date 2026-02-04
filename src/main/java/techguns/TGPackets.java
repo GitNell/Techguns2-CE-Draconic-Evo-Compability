@@ -73,6 +73,7 @@ public class TGPackets implements ITGInitializer {
 		wrapper.registerMessage(PacketGunImpactFX.Handler.class, PacketGunImpactFX.class, packetid++, Side.CLIENT);
 		wrapper.registerMessage(PacketGunImpactFX.Handler.class, PacketGunImpactFX.class, packetid++, Side.CLIENT);
 		wrapper.registerMessage(PacketNBTControl.Handler.class, PacketNBTControl.class, packetid++, Side.SERVER);
+		wrapper.registerMessage(PacketSetStructure.Handler.class, PacketSetStructure.class, packetid++, Side.SERVER);
 	}
 
 	@Override

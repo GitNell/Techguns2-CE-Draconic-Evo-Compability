@@ -43,7 +43,7 @@ public class BlockUtils {
     };
     private static final String FILEPATH = "/assets/techguns/structures/";
     private static final Joiner COMMA_JOINER = Joiner.on(',');
-    private static final Function<Entry<IProperty<?>, Comparable<?>>, String> MAP_ENTRY_TO_STRING = new Function<Entry<IProperty<?>, Comparable<?>>, String>() {
+    private static final Function<Entry<IProperty<?>, Comparable<?>>, String> MAP_ENTRY_TO_STRING = new Function<>() {
         public @NotNull String apply(@Nullable Entry<IProperty<?>, Comparable<?>> p_apply_1_) {
             if (p_apply_1_ == null) {
                 return "<NULL>";
@@ -116,19 +116,11 @@ public class BlockUtils {
     public static List<BlockPos> getBlockPlaneAroundAxisForMining(World world, EntityPlayer ply, BlockPos center, EnumFacing.Axis axis, int radius, boolean includeCenter, @Nullable GenericGunMeleeCharge miningtool, ItemStack stack) {
         List<BlockPos> entries = new ArrayList<>();
 
-        Iterable<BlockPos> blocks;
-        switch (axis) {
-            case X:
-                blocks = BlockPos.getAllInBox(center.add(0, -radius, -radius), center.add(0, radius, radius));
-                break;
-            case Y:
-                blocks = BlockPos.getAllInBox(center.add(-radius, 0, -radius), center.add(radius, 0, radius));
-                break;
-            case Z:
-            default:
-                blocks = BlockPos.getAllInBox(center.add(-radius, -radius, 0), center.add(radius, radius, 0));
-                break;
-        }
+        Iterable<BlockPos> blocks = switch (axis) {
+            case X -> BlockPos.getAllInBox(center.add(0, -radius, -radius), center.add(0, radius, radius));
+            case Y -> BlockPos.getAllInBox(center.add(-radius, 0, -radius), center.add(radius, 0, radius));
+            default -> BlockPos.getAllInBox(center.add(-radius, -radius, 0), center.add(radius, radius, 0));
+        };
 
         blocks.forEach(b -> {
             if (includeCenter || !b.equals(center)) {
@@ -617,6 +609,186 @@ public class BlockUtils {
         }
     }
 
+    public static short[][] loadEntityDataFromFile(String filename) {
+        try {
+            String path = FILEPATH + filename + "_entities";
+            java.io.InputStream is = WorldgenStructure.class.getResourceAsStream(path);
+            if (is == null) {
+                return new short[0][0];
+            }
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            int count = Integer.parseInt(br.readLine());
+            short[][] entities = new short[count][4];
+            String line;
+            int i = 0;
+            while ((line = br.readLine()) != null) {
+                String[] s = line.split(",");
+                for (int j = 0; j < s.length; j++) {
+                    entities[i][j] = Short.parseShort(s[j]);
+                }
+                i++;
+            }
+            br.close();
+            return entities;
+
+        } catch (IOException e) {
+            return new short[0][0];
+        }
+    }
+
+    public static void placeScannedEntities(World world, short[][] entities, ArrayList<MEntity> entityList, int posX, int posY, int posZ, int centerX, int centerZ, int rotation, int pass, EnumLootType loottype, BiomeColorType biome) {
+        if (entities == null || entities.length == 0 || entityList == null || entityList.isEmpty()) {
+            return;
+        }
+        MutableBlockPos p = new MutableBlockPos();
+        BlockPos axis = new BlockPos(posX + centerX, 1, posZ + centerZ);
+        for (short[] data : entities) {
+            int x = data[0];
+            int y = data[1];
+            int z = data[2];
+            int index = data[3];
+
+            if (index >= 0 && index < entityList.size()) {
+                MEntity entity = entityList.get(index);
+                if (entity.getPass() == pass) {
+                    setMEntityRotated(world, entity, p.setPos(posX + x, posY + y, posZ + z), axis, rotation, loottype, biome);
+                }
+            }
+        }
+    }
+
+    public static void setMEntityRotated(World w, MEntity mentity, MutableBlockPos pos, BlockPos axis, int rotation, EnumLootType loottype, BiomeColorType biome) {
+        BlockUtils.rotateAroundY(pos, axis, rotation);
+        mentity.spawnEntity(w, pos, rotation, loottype, biome);
+    }
+
+    public static boolean isAreaClear(World world, int posX, int posY, int posZ, int sizeX, int sizeY, int sizeZ) {
+        MutableBlockPos pos = new MutableBlockPos();
+        int step = 4;
+        for (int x = 0; x <= sizeX; x += step) {
+            for (int y = 0; y <= sizeY; y += step) {
+                for (int z = 0; z <= sizeZ; z += step) {
+                    int checkX = posX + Math.min(x, sizeX - 1);
+                    int checkY = posY + Math.min(y, sizeY - 1);
+                    int checkZ = posZ + Math.min(z, sizeZ - 1);
+                    if (!world.isAirBlock(pos.setPos(checkX, checkY, checkZ))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public static int getEndIslandHeightValue(World w, int x, int z) {
+        MutableBlockPos p = new MutableBlockPos();
+        for (int y = 255; y > 0; y--) {
+            IBlockState state = w.getBlockState(p.setPos(x, y, z));
+            Block block = state.getBlock();
+            if (block == Blocks.END_STONE || block == Blocks.END_BRICKS) {
+                return y;
+            }
+        }
+        return -1;
+    }
+
+    public static int getValidEndIslandSpawnY(World world, int x, int z, int sizeX, int sizeZ, int heightDiffLimit, int step) {
+        int count = 0;
+        int validCount = 0;
+        int min = 255;
+        int max = 0;
+        int sum = 0;
+
+        int ix = 0;
+        while (ix <= sizeX) {
+            int iz = 0;
+            while (iz <= sizeZ) {
+                count++;
+                int h = getEndIslandHeightValue(world, x + ix, z + iz);
+
+                if (h > 0) {
+                    validCount++;
+                    if (h < min) {
+                        min = h;
+                    }
+                    if (h > max) {
+                        max = h;
+                    }
+                    sum += h;
+                }
+
+                if (iz < sizeZ) {
+                    iz = Math.min(iz + step, sizeZ);
+                } else {
+                    break;
+                }
+            }
+
+            if (ix < sizeX) {
+                ix = Math.min(ix + step, sizeX);
+            } else {
+                break;
+            }
+        }
+
+        if (validCount < 2 || validCount < count / 3) {
+            return -1;
+        }
+
+        if ((max - min) > heightDiffLimit * 2) {
+            return -1;
+        }
+
+        return sum / validCount;
+    }
+
+    public static int findEndIslandInRange(World world, int x, int z, int sizeX, int sizeZ, int minY, int maxY) {
+        MutableBlockPos pos = new MutableBlockPos();
+        int step = 4;
+        int sum = 0;
+        int count = 0;
+
+        for (int ix = 0; ix <= sizeX; ix += step) {
+            for (int iz = 0; iz <= sizeZ; iz += step) {
+                for (int y = maxY; y >= minY; y--) {
+                    IBlockState state = world.getBlockState(pos.setPos(x + ix, y, z + iz));
+                    Block block = state.getBlock();
+                    if (block == Blocks.END_STONE || block == Blocks.END_BRICKS) {
+                        sum += y;
+                        count++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (count > 0) {
+            return sum / count;
+        }
+        return (minY + maxY) / 2;
+    }
+
+    public static void placeFoundationEnd(World world, int posX, int posY, int posZ, int sizeX, int sizeZ, int direction, int centerX, int centerZ, int depth) {
+        MutableBlockPos p = new MutableBlockPos();
+        BlockPos axis = new BlockPos(posX + centerX, 1, posZ + centerZ);
+        IBlockState endStone = Blocks.END_STONE.getDefaultState();
+
+        for (int ix = 0; ix < sizeX; ix++) {
+            for (int iz = 0; iz < sizeZ; iz++) {
+                for (int d = 1; d <= depth; d++) {
+                    p.setPos(posX + ix, posY - d, posZ + iz);
+                    BlockUtils.rotateAroundY(p, axis, direction);
+                    IBlockState current = world.getBlockState(p);
+                    if (current.getBlock().isReplaceable(world, p) || current.getMaterial() == Material.AIR) {
+                        world.setBlockState(p, endStone, 2);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public static void placeFoundation(World world, short[][] blocks, ArrayList<MBlock> blockList, int posX, int posY, int posZ, int centerX, int centerZ, int rotation, int pass, int range) {
         MutableBlockPos p = new MutableBlockPos();
         BlockPos axis = new BlockPos(posX + centerX, 1, posZ + centerZ);
@@ -948,15 +1120,11 @@ public class BlockUtils {
      * @return
      */
     public static int facingToRotation(EnumFacing facing) {
-        switch (facing) {
-            case WEST:
-                return 0;
-            case SOUTH:
-                return 1;
-            case EAST:
-                return 2;
-            default:
-                return 3;
-        }
+        return switch (facing) {
+            case WEST -> 0;
+            case SOUTH -> 1;
+            case EAST -> 2;
+            default -> 3;
+        };
     }
 }

@@ -189,8 +189,7 @@ public class MBlock implements Serializable {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof BlockMeta) {
-                BlockMeta other = (BlockMeta) obj;
+            if (obj instanceof BlockMeta other) {
                 return this.blockid == other.blockid && this.blockname.equals(other.blockname);
             }
             return false;

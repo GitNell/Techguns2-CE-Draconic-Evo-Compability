@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import techguns.Tags;
+import techguns.gui.containers.BlastFurnaceContainer;
 import techguns.gui.containers.ChargingStationContainer;
 import techguns.tileentities.ChargingStationTileEnt;
 
@@ -17,6 +18,9 @@ public class ChargingStationGui extends PoweredTileEntGui {
         super(new ChargingStationContainer(ply, tile), tile);
         this.tile = tile;
         this.tex = texture;
+        this.appearanceType = EnumAppearanceType.REGULAR;
+        this.upgradeSlotX = ChargingStationContainer.SLOT_UPGRADE_X - 2;
+        this.upgradeSlotY = ChargingStationContainer.SLOT_UPGRADE_Y - 2;
     }
 
     @Override

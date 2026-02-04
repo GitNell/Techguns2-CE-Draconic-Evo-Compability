@@ -98,6 +98,8 @@ public class TGJeiPlugin implements IModPlugin {
 		registry.addRecipeCatalyst(new ItemStack(TGBlocks.SIMPLE_MACHINE,1,TGBlocks.SIMPLE_MACHINE.getMetaFromState(TGBlocks.SIMPLE_MACHINE.getDefaultState().withProperty(TGBlocks.SIMPLE_MACHINE.MACHINE_TYPE, EnumSimpleMachineType.BLAST_FURNACE))), BLAST_FURNACE);
 		registry.addRecipeCatalyst(new ItemStack(TGBlocks.SIMPLE_MACHINE2,1,TGBlocks.SIMPLE_MACHINE2.getMetaFromState(TGBlocks.SIMPLE_MACHINE2.getDefaultState().withProperty(TGBlocks.SIMPLE_MACHINE2.MACHINE_TYPE, EnumSimpleMachineType2.GRINDER))), GRINDER);
 		registry.addRecipeCatalyst(new ItemStack(TGBlocks.SIMPLE_MACHINE2,1,TGBlocks.SIMPLE_MACHINE2.getMetaFromState(TGBlocks.SIMPLE_MACHINE2.getDefaultState().withProperty(TGBlocks.SIMPLE_MACHINE2.MACHINE_TYPE, EnumSimpleMachineType2.ARMOR_BENCH))), UPGRADE_BENCH);
+
+		registry.addAdvancedGuiHandlers(new ChemLabAdvancedGuiHandler());
 	}
 	
 	

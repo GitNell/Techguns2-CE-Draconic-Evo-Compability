@@ -2,27 +2,24 @@ package techguns.items;
 
 import java.util.Random;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import org.jetbrains.annotations.NotNull;
-import techguns.util.BlockUtils;
-import techguns.world.dungeon.Dungeon;
-import techguns.world.dungeon.presets.IDungeonPreset;
-import techguns.world.structures.MilitaryCamp;
-import techguns.world.structures.NetherDungeonEntrance;
-import techguns.world.structures.WorldgenStructure.BiomeColorType;
+import techguns.gui.StructureSpawnerGui;
+import techguns.world.StructureRegistry;
+import techguns.world.structures.WorldgenStructure;
 
 public class WorldGenTestTool extends GenericItem {
-
-    static String[] modes = new String[]{"MilitaryBase", "Barracks", "Smooth", "Flatten", "Remove Junk"};
 
     public WorldGenTestTool(String name) {
         this(name, true);
@@ -35,125 +32,49 @@ public class WorldGenTestTool extends GenericItem {
     @Override
     public @NotNull ActionResult<ItemStack> onItemRightClick(@NotNull World world, EntityPlayer player, @NotNull EnumHand hand) {
         ItemStack item = player.getHeldItem(hand);
+
         if (!item.hasTagCompound()) {
             item.setTagCompound(new NBTTagCompound());
         }
-        if (player.isSneaking()) {
-            int mode = 1;
-            if (item.getTagCompound().hasKey("mode")) {
-                mode = (item.getTagCompound().getInteger("mode") + 1) % modes.length;
+
+        String structureName = item.getTagCompound().getString("structure");
+
+        if (player.isSneaking() || structureName.isEmpty()) {
+            // Open GUI to select structure
+            if (world.isRemote) {
+                Minecraft.getMinecraft().displayGuiScreen(new StructureSpawnerGui());
             }
-            item.getTagCompound().setInteger("mode", mode);
-            if (world.isRemote)
-                player.sendStatusMessage(new TextComponentString("WorldGen tool mode set to \"" + modes[mode] + "\"."), false);
+            return new ActionResult<>(EnumActionResult.SUCCESS, item);
         }
-        return super.onItemRightClick(world, player, hand);
+
+        // Spawn structure on server
+        if (!world.isRemote) {
+            spawnStructure(world, player, structureName);
+        }
+
+        return new ActionResult<>(EnumActionResult.SUCCESS, item);
     }
 
-    @Override
-    public @NotNull EnumActionResult onItemUse(EntityPlayer player, @NotNull World world, BlockPos pos, @NotNull EnumHand hand,
-                                               @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
+    private void spawnStructure(World world, EntityPlayer player, String structureName) {
+        StructureRegistry.init();
+        WorldgenStructure structure = StructureRegistry.createStructure(structureName);
 
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
+        if (structure != null) {
+            BlockPos pos = player.getPosition();
+            Random rnd = new Random();
+            Biome biome = world.getBiome(pos);
 
-        ItemStack item = player.getHeldItem(hand);
-        if (!item.hasTagCompound()) {
-            item.setTagCompound(new NBTTagCompound());
-        }
-        if (player.isSneaking()) {
-            int mode = 1;
-            if (item.getTagCompound().hasKey("mode")) {
-                mode = (item.getTagCompound().getInteger("mode") + 1) % modes.length;
-            }
-            item.getTagCompound().setInteger("mode", mode);
-            if (world.isRemote)
-                player.sendStatusMessage(new TextComponentString("WorldGen tool mode set to \"" + modes[mode] + "\"."), false);
+            int sizeX = structure.getSizeX(rnd);
+            int sizeY = structure.getSizeY(rnd);
+            int sizeZ = structure.getSizeZ(rnd);
+
+            structure.setBlocks(world, pos.getX(), pos.getY() - 1, pos.getZ(),
+                    sizeX, sizeY, sizeZ, 0,
+                    StructureRegistry.getBiomeColorType(biome), rnd);
+
+            player.sendMessage(new TextComponentString(TextFormatting.GREEN + "Spawned: " + TextFormatting.YELLOW + structureName));
         } else {
-            if (item.getTagCompound().hasKey("x1") && item.getTagCompound().hasKey("y1") && item.getTagCompound().hasKey("z1")) {
-
-                if (world.isRemote)
-                    player.sendStatusMessage(new TextComponentString("Position2 set (" + x + "/" + y + "/" + z + ")."), false);
-                int x1 = item.getTagCompound().getInteger("x1");
-                int y1 = item.getTagCompound().getInteger("y1");
-                int z1 = item.getTagCompound().getInteger("z1");
-                int sizeX = Math.abs(x1 - x) + 1;
-                int sizeY = Math.abs(y1 - y) + 1;
-                int sizeZ = Math.abs(z1 - z) + 1;
-
-                if (world.isRemote)
-                    player.sendStatusMessage(new TextComponentString("Size: (" + sizeX + "/" + sizeY + "/" + sizeZ + ")."), false);
-
-                if (!world.isRemote) {
-                    int mode = 0;
-                    if (item.getTagCompound().hasKey("mode")) {
-                        mode = item.getTagCompound().getInteger("mode");
-                    }
-                    doOperation(world, Math.min(x, x1), Math.min(y, y1), Math.min(z, z1), sizeX, sizeZ, mode);
-
-                }
-
-                item.getTagCompound().removeTag("x1");
-                item.getTagCompound().removeTag("y1");
-                item.getTagCompound().removeTag("z1");
-
-            } else {
-                item.getTagCompound().setInteger("x1", x);
-                item.getTagCompound().setInteger("y1", y);
-                item.getTagCompound().setInteger("z1", z);
-                if (world.isRemote)
-                    player.sendStatusMessage(new TextComponentString("Position1 set (" + x + "/" + y + "/" + z + ")."), false);
-            }
+            player.sendMessage(new TextComponentString(TextFormatting.RED + "Structure not found: " + structureName));
         }
-        return EnumActionResult.SUCCESS;
     }
-
-
-    private void doOperation(World world, int x, int y, int z, int sizeX, int sizeZ, int mode) {
-
-        Random rnd = new Random();
-        switch (mode) {
-            case 0: //structure
-                MilitaryCamp camp = new MilitaryCamp(3, rnd);
-                camp.init(x, y, z, sizeX, sizeZ);
-                camp.setBlocks(world, rnd);
-                break;
-            case 1: //dungeon
-
-
-                IDungeonPreset preset = IDungeonPreset.PRESET_NETHER;
-                Dungeon dungeon = new Dungeon(preset);
-
-                int height = 24 + world.rand.nextInt(25);
-
-                int yOffset = preset.getSizeY() + (height % preset.getSizeY()) - height;
-
-                dungeon.generate(world, x, y + yOffset, z, sizeX, height, sizeZ);
-
-                NetherDungeonEntrance e = new NetherDungeonEntrance();
-
-                int px = x + (dungeon.startPos.getX() * preset.getSizeXZ());
-                int py = y + (dungeon.startPos.getY() * preset.getSizeY()) + yOffset;
-                int pz = z + (dungeon.startPos.getZ() * preset.getSizeXZ());
-
-                e.setBlocks(world, px + 1 - preset.getSizeXZ() / 2, py, pz + 1 - preset.getSizeXZ() / 2, e.sizeX, e.sizeY, e.sizeZ, BlockUtils.facingToRotation(dungeon.startRotation), BiomeColorType.WOODLAND, rnd);
-
-                //bugnest
-
-                break;
-            case 2: //Smooth
-                BlockUtils.apply2DHeightmapFilter(world, x, z, sizeX, sizeZ, BlockUtils.FILTER_GAUSSIAN_5x5);
-                break;
-            case 3: //Flatten
-                BlockUtils.flattenArea(world, x, z, sizeX, sizeZ, 2);
-                break;
-            case 4: //remove junk
-                BlockUtils.removeJunkInArea(world, x, z, sizeX, sizeZ);
-                break;
-        }
-
-    }
-
-
 }

@@ -186,9 +186,10 @@ public class ExplosiveChargeTileEnt extends BasicOwnedTileEnt implements ITickab
         return new TextComponentString(Tags.MOD_ID + ".inventory.explosivecharge");
     }
 
-    public boolean isArmed() {
-        return armed;
-    }
+    public short getBlastradius() { return blastradius; }
+    public short getBlastlength() { return blastlength; }
+    public short getFusetime() { return fusetime; }
+    public boolean isArmed() { return armed; }
 
     @Override
     public void buttonClicked(int id, EntityPlayer ply, String data) {

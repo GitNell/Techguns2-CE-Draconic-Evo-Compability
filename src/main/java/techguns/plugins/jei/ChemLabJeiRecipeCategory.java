@@ -2,6 +2,7 @@ package techguns.plugins.jei;
 
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawableAnimated;
+import mezz.jei.api.gui.IGuiFluidStackGroup;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
@@ -41,6 +42,12 @@ public class ChemLabJeiRecipeCategory extends BasicRecipeCategory<ChemLabJeiReci
     private static final int SLOT_STEAM_X = 135 - BG_U;
     private static final int SLOT_STEAM_Y = 57 - BG_V;
 
+    private static final int TANK_IN_X = 20 - BG_U;
+    private static final int TANK_OUT_X = 160 - BG_U;
+    private static final int TANK_Y = 16 - BG_V;
+    private static final int TANK_INNER_W = 10;
+    private static final int TANK_INNER_H = 50;
+
     public ChemLabJeiRecipeCategory(IGuiHelper guiHelper) {
         super(guiHelper, TEXTURE, "chemlab", TGJeiPlugin.CHEM_LAB);
         this.background = guiHelper.createDrawable(TEXTURE, 4, 10, 174, 69);
@@ -52,6 +59,7 @@ public class ChemLabJeiRecipeCategory extends BasicRecipeCategory<ChemLabJeiReci
     @Override
     public void setRecipe(IRecipeLayout recipeLayout, @NotNull ChemLabJeiRecipe recipeWrapper, @NotNull IIngredients ingredients) {
         IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
+        IGuiFluidStackGroup guiFluidStacks = recipeLayout.getFluidStacks();
 
         guiItemStacks.init(SLOT_IN1, true, SLOT_IN1_X, SLOT_IN1_Y);
         guiItemStacks.init(SLOT_IN2, true, SLOT_IN2_X, SLOT_IN2_Y);
@@ -63,7 +71,11 @@ public class ChemLabJeiRecipeCategory extends BasicRecipeCategory<ChemLabJeiReci
             guiItemStacks.init(SLOT_STEAM, true, SLOT_STEAM_X, SLOT_STEAM_Y);
         }
 
+        guiFluidStacks.init(0, true, TANK_IN_X + 1, TANK_Y + 1, TANK_INNER_W, TANK_INNER_H, 8000, false, null);
+        guiFluidStacks.init(1, false, TANK_OUT_X + 1, TANK_Y + 1, TANK_INNER_W, TANK_INNER_H, 16000, false, null);
+
         guiItemStacks.set(ingredients);
+        guiFluidStacks.set(ingredients);
 
         if (recipeWrapper.recipe.reqSteamUpgrade) {
             ItemStack s = new ItemStack(TGItems.SHARED_ITEM, 1, TGItems.MACHINE_UPGRADE_STEAM.getItemDamage());

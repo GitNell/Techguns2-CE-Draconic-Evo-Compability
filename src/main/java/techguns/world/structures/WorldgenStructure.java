@@ -158,6 +158,35 @@ public abstract class WorldgenStructure {
         this.setBlocks(world, x, y - 1, z, sizeX, sizeY, sizeZ, direction, getBiomeColorTypeFromBiome(biome), rnd);
     }
 
+    public void spawnStructureEndWorldgen(World world, int chunkX, int chunkZ, int sizeX, int sizeY, int sizeZ, Random rnd, Biome biome) {
+        int direction = rnd.nextInt(4);
+
+        int sizeXr = direction == 0 || direction == 2 ? sizeX : sizeZ;
+        int sizeZr = direction == 0 || direction == 2 ? sizeZ : sizeX;
+
+        int centerX = (int) (sizeX / 2.0f);
+        int centerZ = (int) (sizeZ / 2.0f);
+
+        int[] p0 = rotatePoint(0, 0, direction, centerX, centerZ);
+        int[] p1 = rotatePoint(sizeX, 0, direction, centerX, centerZ);
+        int[] p2 = rotatePoint(0, sizeZ, direction, centerX, centerZ);
+        int[] p3 = rotatePoint(sizeX, sizeZ, direction, centerX, centerZ);
+
+        int minX = Math.min(Math.min(p0[0], p1[0]), Math.min(p2[0], p3[0]));
+        int minZ = Math.min(Math.min(p0[1], p1[1]), Math.min(p2[1], p3[1]));
+
+        int x = minX + chunkX * 16;
+        int z = minZ + chunkZ * 16;
+
+        int y = BlockUtils.getValidEndIslandSpawnY(world, x, z, sizeXr, sizeZr, this.heightdiffLimit, getStep());
+
+        if (y < 0) {
+            return;
+        }
+
+        this.setBlocks(world, x, y, z, sizeX, sizeY, sizeZ, direction, BiomeColorType.WOODLAND, rnd);
+    }
+
     public void spawnStructureCaveWorldgen(World world, int chunkX, int chunkZ, int sizeX, int sizeY, int sizeZ, Random rnd, Biome biome) {
         int direction = rnd.nextInt(4);
 
@@ -210,16 +239,12 @@ public abstract class WorldgenStructure {
 
     //W-N-E-S
     public static EnumFacing directionToFacing(int direction) {
-        switch (direction) {
-            case 0:
-                return EnumFacing.WEST;
-            case 2:
-                return EnumFacing.EAST;
-            case 3:
-                return EnumFacing.SOUTH;
-            default:
-                return EnumFacing.NORTH;
-        }
+        return switch (direction) {
+            case 0 -> EnumFacing.WEST;
+            case 2 -> EnumFacing.EAST;
+            case 3 -> EnumFacing.SOUTH;
+            default -> EnumFacing.NORTH;
+        };
     }
 
     public enum BiomeColorType {

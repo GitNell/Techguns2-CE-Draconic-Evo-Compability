@@ -7,10 +7,7 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -24,9 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import techguns.api.machines.IMachineType;
 import techguns.tileentities.ExplosiveChargeTileEnt;
 import techguns.util.BlockUtils;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 public class BlockExplosiveCharge<T extends Enum<T> & IStringSerializable & IMachineType> extends BasicMachine<T> {
 
@@ -73,24 +67,13 @@ public class BlockExplosiveCharge<T extends Enum<T> & IStringSerializable & IMac
 	@Override
 	public @NotNull IBlockState getActualState(@NotNull IBlockState state, IBlockAccess worldIn, @NotNull BlockPos pos) {
 		TileEntity tile = worldIn.getTileEntity(pos);
-		if(tile instanceof ExplosiveChargeTileEnt) {
-			ExplosiveChargeTileEnt charge = (ExplosiveChargeTileEnt) tile;
-			return state.withProperty(ARMED,charge.isArmed());
+		if(tile instanceof ExplosiveChargeTileEnt charge) {
+            return state.withProperty(ARMED,charge.isArmed());
 		}
 		return state;
 	}
 
-	@Override
-	public boolean isFullCube(@NotNull IBlockState state) {
-		return false;
-	}
-	
-	@Override
-	public boolean isOpaqueCube(@NotNull IBlockState state) {
-		return false;
-	}
-	
-	/**
+    /**
      * Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the
      * IBlockstate
      */
@@ -150,34 +133,5 @@ public class BlockExplosiveCharge<T extends Enum<T> & IStringSerializable & IMac
 			return true;
 		} 
 		return false;
-	}
-
-	@Override
-	public boolean onBlockActivated(World world, @NotNull BlockPos pos, @NotNull IBlockState state, @NotNull EntityPlayer player, @NotNull EnumHand hand, @NotNull EnumFacing facing, float hitX, float hitY, float hitZ) {
-		TileEntity tile = world.getTileEntity(pos);
-		if (!world.isRemote && tile instanceof ExplosiveChargeTileEnt) {
-			((ExplosiveChargeTileEnt) tile).buttonClicked(0, player, "");
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, @NotNull List<String> tooltip, @NotNull ITooltipFlag flagIn) {
-		int meta = stack.getMetadata();
-		EnumExplosiveChargeType type = EnumExplosiveChargeType.values()[meta];
-
-		switch (type) {
-			case TNT:
-				tooltip.add("Площадь взрыва: §e3х3 блока");
-				tooltip.add("Глубина взрыва: §a1 блок");
-				tooltip.add("Задержка таймера: §a20 секунд");
-				break;
-			case ADVANCED:
-				tooltip.add("Площадь взрыва: §e3х3 блока");
-				tooltip.add("Глубина взрыва: §63 блока");
-				tooltip.add("Задержка таймера: §e15 секунд");
-				break;
-		}
 	}
 }

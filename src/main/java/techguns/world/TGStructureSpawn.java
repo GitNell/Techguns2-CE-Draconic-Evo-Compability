@@ -14,18 +14,18 @@ public class TGStructureSpawn {
      */
     ArrayList<BiomeDictionary.Type> biomeWhitelist;
 
-    ArrayList<Integer> dimensionIDs;
+    int dimensionID;
 
     StructureSize size;
 
     ArrayList<StructureLandType> allowedTypes;
 
-    public TGStructureSpawn(WorldgenStructure structure, int spawnWeight, ArrayList<BiomeDictionary.Type> biomeWhitelist, ArrayList<Integer> dimensionIDs, ArrayList<StructureLandType> allowedTypes, StructureSize size) {
+    public TGStructureSpawn(WorldgenStructure structure, int spawnWeight, ArrayList<BiomeDictionary.Type> biomeWhitelist, int dimensionID, ArrayList<StructureLandType> allowedTypes, StructureSize size) {
         super();
         this.structure = structure;
         this.spawnWeight = spawnWeight;
         this.biomeWhitelist = biomeWhitelist;
-        this.dimensionIDs = dimensionIDs;
+        this.dimensionID = dimensionID;
         this.allowedTypes = allowedTypes;
         this.size = size;
     }
@@ -53,7 +53,7 @@ public class TGStructureSpawn {
     }
 
     public boolean dimensionMatches(int id) {
-        return this.dimensionIDs.contains(id);
+        return this.dimensionID == id;
     }
 
 }

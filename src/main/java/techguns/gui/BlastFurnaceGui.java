@@ -17,8 +17,9 @@ public class BlastFurnaceGui extends PoweredTileEntGui {
         super(new BlastFurnaceContainer(ply, tileent), tileent);
         this.tile = tileent;
         this.tex = texture;
-        this.upgradeSlotX = BlastFurnaceContainer.SLOT_UPGRADE_X - 1;
-        this.upgradeSlotY = BlastFurnaceContainer.SLOT_UPGRADE_Y - 1;
+        this.appearanceType = EnumAppearanceType.REGULAR;
+        this.upgradeSlotX = BlastFurnaceContainer.SLOT_UPGRADE_X - 2;
+        this.upgradeSlotY = BlastFurnaceContainer.SLOT_UPGRADE_Y - 2;
     }
 
     @Override

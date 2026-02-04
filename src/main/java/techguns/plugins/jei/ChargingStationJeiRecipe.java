@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import mezz.jei.api.IJeiHelpers;
-import mezz.jei.api.recipe.IStackHelper;
 import org.jetbrains.annotations.NotNull;
 import techguns.gui.PoweredTileEntGui;
 import techguns.gui.TGBaseGui;
@@ -49,9 +48,8 @@ public class ChargingStationJeiRecipe extends BasicRecipeWrapper {
 	}
 
 	public static List<ChargingStationJeiRecipe> getRecipes(IJeiHelpers helpers) {
-		IStackHelper stackHelper = helpers.getStackHelper();
-	
-		List<ChargingStationJeiRecipe> recipes = new ArrayList<ChargingStationJeiRecipe>();
+
+        List<ChargingStationJeiRecipe> recipes = new ArrayList<>();
 		
 		ChargingStationRecipe.getRecipes().forEach(r -> recipes.add(new ChargingStationJeiRecipe(r)));
 		

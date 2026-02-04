@@ -87,10 +87,18 @@ public class TGConfig {
 	public static float damageTurretToPlayer;
 	public static float damageFactorNPC;
 	
-	public static int spawnWeightTGStructureSmall;
-	public static int spawnWeightTGStructureBig;
-	public static int spawnWeightTGStructureMedium;
-	
+	public static int spawnWeightTGStructureSmallOverworld;
+	public static int spawnWeightTGStructureBigOverworld;
+	public static int spawnWeightTGStructureMediumOverworld;
+
+	public static int spawnWeightTGStructureSmallNether;
+	public static int spawnWeightTGStructureBigNether;
+	public static int spawnWeightTGStructureMediumNether;
+
+	public static int spawnWeightTGStructureSmallEnd;
+	public static int spawnWeightTGStructureBigEnd;
+	public static int spawnWeightTGStructureMediumEnd;
+
 	//structure spawning
 	public static boolean doWorldspawn;
 	
@@ -261,10 +269,17 @@ public class TGConfig {
 		
 		doWorldspawn = config.getBoolean("SpawnStructures", WORLDGEN, true, "Should Structures (military bases) be spawned in the world?");
 		
-		spawnWeightTGStructureBig = config.getInt("StructureSpawnWeightBig", WORLDGEN, 64, 16, 100000, "Every X chunks it's tried to spawnn a Big building. This is in both dimensions, ChunkX, and ChunkY modulo <this Value> must be 0");
-		spawnWeightTGStructureSmall = config.getInt("StructureSpawnWeightSmall", WORLDGEN, 16, 4, 100000, "Every X chunks it's tried to spawnn a Small building. This is in both dimensions, ChunkX, and ChunkY modulo <this Value> must be 0");
-		spawnWeightTGStructureMedium = config.getInt("StructureSpawnWeightMedium", WORLDGEN, 32, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is in both dimensions, ChunkX, and ChunkY modulo <this Value> must be 0");
-		
+		spawnWeightTGStructureBigOverworld = config.getInt("StructureSpawnWeightBigOverworld", WORLDGEN, 64, 16, 100000, "Every X chunks it's tried to spawnn a Big building. This is only in overworld, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureSmallOverworld = config.getInt("StructureSpawnWeightSmallOverworld", WORLDGEN, 16, 4, 100000, "Every X chunks it's tried to spawnn a Small building. This is only in overworld, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureMediumOverworld = config.getInt("StructureSpawnWeightMediumOverworld", WORLDGEN, 32, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is only in overworld, ChunkX, and ChunkY modulo <this Value> must be 0");
+		// Note: yup, nether values have to be much lower than overworld ones since the structure spawner seems to spawn structures in, like, 20% of the cases
+		spawnWeightTGStructureBigNether = config.getInt("StructureSpawnWeightBigNether", WORLDGEN, 24, 16, 100000, "Every X chunks it's tried to spawnn a Big building. This is only in the Nether, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureSmallNether = config.getInt("StructureSpawnWeightSmallNether", WORLDGEN, 8, 4, 100000, "Every X chunks it's tried to spawnn a Small building. This is only in the Nether, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureMediumNether = config.getInt("StructureSpawnWeightMediumNether", WORLDGEN, 10, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is only in the Nether, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureBigEnd = config.getInt("StructureSpawnWeightBigEnd", WORLDGEN, 64, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is only in the End, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureSmallEnd = config.getInt("StructureSpawnWeightSmallEnd", WORLDGEN, 16, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is only in the End, ChunkX, and ChunkY modulo <this Value> must be 0");
+		spawnWeightTGStructureMediumEnd = config.getInt("StructureSpawnWeightMediumEnd", WORLDGEN, 42, 8, 100000, "Every X chunks it's tried to spawnn a Medium building. This is only in the End, ChunkX, and ChunkY modulo <this Value> must be 0");
+
 		
 		spawnOreClusterStructures = config.getBoolean("SpawnOreClusterStructures", WORLDGEN, true, "When worldgen is enabled, include structure spawns that contain ore clusters.");
 		

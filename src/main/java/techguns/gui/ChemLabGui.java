@@ -44,6 +44,10 @@ public class ChemLabGui extends PoweredTileEntGui {
         this.appearanceType = EnumAppearanceType.REGULAR;
     }
 
+    public ChemLabTileEnt getTile() {
+        return this.tile;
+    }
+
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         super.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
@@ -76,6 +80,8 @@ public class ChemLabGui extends PoweredTileEntGui {
         }
 
         this.mc.getTextureManager().bindTexture(texture);
+        this.drawTexturedModalRect(k + 20, l + 16, 202, 0, 12, 52);
+        this.drawTexturedModalRect(k + 177, l + 16, 202, 0, 12, 52);
 
         if (tile.getDrainMode() == 0) {
             this.drawTexturedModalRect(k + 177, l + 69, 214, 29, 12, 6);

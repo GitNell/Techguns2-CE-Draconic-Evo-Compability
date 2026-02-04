@@ -10,7 +10,8 @@
                 {
                     "type": "item",
                     "weight": 15,
-                    "name": "minecraft:iron_ingot",
+					"entryName": "steel_ingot",
+                    "name": "techguns:itemshared",
 					"functions": [
 						{
 							"function": "set_data",

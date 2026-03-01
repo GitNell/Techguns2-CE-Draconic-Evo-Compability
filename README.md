@@ -1,49 +1,25 @@
-<div dir=rtl align=center>
+# Techguns 2 (Completion Update) - Draconic Evolution Compatibility Fix
 
-### **English 🇺🇸** / [**Русский 🇷🇺**](README_ru.md)
-</div>
+This is a fork of the **Techguns 2 (1.12.2)** mod, specifically patched to resolve long-standing issues with external energy shields.
 
-<p align="center"><img src="https://cdn.modrinth.com/data/cached_images/706d4415e491f921e6d9c5e8628a81bde5adf93f.png" alt="Logo" width="800"></p>
+## 🛠 What's Fixed?
+The main goal of this fork is to fix the conflict where Techguns bullets would completely bypass **Draconic Evolution** energy shields, damaging the player's health directly.
 
-<h4 align="center">
-    <a href="https://www.curseforge.com/minecraft/mc-mods/techguns-ce"><img src="http://cf.way2muchnoise.eu/1417575.svg" alt="CF"></a>
-    <a href="https://modrinth.com/mod/techguns"><img src="https://img.shields.io/modrinth/dt/techguns?logo=modrinth&label=&suffix=%20&style=flat&color=242629&labelColor=5ca424&logoColor=1c1c1c" alt="Modrinth"></a>
-	<a href="https://discord.gg/TAqk3wJEyp"><img src="https://img.shields.io/discord/332546158108868620?color=5865f2&label=Discord&style=flat" alt="Discord"></a>
-</h4>
+### Technical Changes:
+* **Event Priority Adjustment:** Changed `OnLivingAttack` and `onLivingHurt` event priorities in `TGEventHandler` from `HIGH` to `LOWEST`.
+* **Shield Recognition:** This change allows Draconic Evolution (and potentially other shield mods like Matter Overdrive or Modular Turrets) to intercept damage before the Techguns internal damage system processes it.
+* **Standard Damage Preserved:** Verified that normal damage (without armor/shields) still functions correctly for both players and NPCs.
 
-# **A continuation** of one of the most popular 1.12 gun mods, [Techguns](https://www.curseforge.com/minecraft/mc-mods/techguns).
+## 🚀 How to Install
+1. Go to the [Releases](https://github.com/GitNell/Techguns2-CE-Draconic-Evo-Compability/releases) tab.
+2. Download the latest `.jar` file.
+3. Replace the original Techguns JAR in your Minecraft `mods` folder with this patched version.
 
-> [!IMPORTANT]
-> **Since this fork is considered to be unofficial, the credit goes to the [original author!](https://github.com/pWn3d1337)**
+## 🏗 For Developers
+If you want to build this from source:
+1. Clone the repository: `git clone https://github.com/GitNell/Techguns2-CE-Draconic-Evo-Compability.git`
+2. Run `./gradlew build` (or `gradle build` if using system Gradle).
+3. Find the output in `build/libs/`.
 
-ㅤ
-![Description](https://cdn.modrinth.com/data/cached_images/fbaf69ad4f9a3b7862fec787242a4bf8f8e6356a.png)
-ㅤ
-
-This mod is a modernized version of original discontinued 1.12 **Techguns** mod, aiming to look more modern and finished than ever. The initial purpose was to fix old various bugs and finish some things left there in the mod by pwn3d. Then this edition continued to change significantly, having its code slowly refactored, thus it turned into Community Edition we know today.
-
-
-## Changes made by this edition:
-- **Added** missing crafts along with new parts for: MK2 armor; Nether Combat armor; UV Emitter
-- **Supermutants** now spawn in the End; they are required for UV Emitter craft because of UV element they drop now!
-- **Changed** the progression slightly: Steam Armor is more expensive to craft and maintain, making other armors a viable option; Cyberdemons don't drop Cybernetic parts anymore - they drop only Cyberdemon Flesh, becoming a gateway for Fabricator; for Reaction Chamber you need a blueprint which you can find in Nether Fortress!
-- **Fixed** the old Upgrade Stack dupe via Metal Press
-- **Fixed** various CT issues; for example, you can set multiple items in Metal Press instead of singular ones (for example, 2 copper plates and 5 steel ones to craft a soul sand block!); also now you can properly set .nbt-tagged items as output in the Fabricator (for example, you can make MK2 armor craft there, already charged)
-- **Fixed** Minecraft **crashing** when entering the Nether
-- **Ghastlings** now do actually _spawn_, also they shoot **rockets** instead of small fireballs
-- **Reworked** most of GUI's, including: Ammo Press, Metal Press, Chemical Laboratory, Grinder, Fabricator and Reaction Chamber; **reworked** the ammo HUD (which is changeable in the configs!)
-- **Simplified** the Reaction Chamber - now it doesn't need strict amount restrictions for fluid to work properly!
-- **Added** 2 new dungeons: Depot and Big Factory House
-- **Fixed** Minecraft **crashing** when trying to apply radiation in multiplayer
-- **Fixed** nuclear microreactors **not having any craft**
-- **Buffed** Ore Clusters: now they consume only 80% of their previous energy multiplier and give 2x of previous ore multiplier!
-- Most mobs became **smarter and/or harder**, especially living ones; they can **open doors** by themselves, they stopped friendly-firing themselves, they can **hear** and they stopped falling so much in mob farms willingly!
-- Fixed Psycho steve dropping 2 or even 3 chainsaws from one kill
-- Radiation system balanced to be more **dangerous** + fixed typos restricting the uranium to be actually radioactive -> radiation system is turned **on** by default from now on
-- **Helicopters** are much more dangerous - they are more durable and shoot much more rockets
-- **Added** new camouflages for different armor!
-- In general - **Ready-to-use** Techguns mod with Completion Update and more!
-
-
-## Important note: the mod is not fully polished; there may be some minor bugs. You can report them in the ["Issues" tab on this repository](https://github.com/TheSlize/Techguns2-Completion-Update/issues)!
-
+---
+*Based on the Completion Update by TheSlize. Original mod by Techguns Team.*

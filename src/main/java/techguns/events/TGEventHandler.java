@@ -100,20 +100,18 @@ public class TGEventHandler {
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public static void onMouseEvent(MouseEvent event) {
 		if (event.getButton()!=-1){
-		
+
 			EntityPlayerSP ply = Minecraft.getMinecraft().player;
-			
+
 			if (Minecraft.getMinecraft().inGameHasFocus) {
-				// System.out.println("MOUSE EVENT LMB");
 				if (event.getButton() == 0 && !ply.getHeldItemMainhand().isEmpty() && ply.getHeldItemMainhand().getItem() instanceof IGenericGun) {
-	
+
 					ClientProxy cp = ClientProxy.get();
-					
+
 					if (((IGenericGun) ply.getHeldItemMainhand().getItem()).isShootWithLeftClick()) {
 						cp.keyFirePressedMainhand = event.isButtonstate();
 						event.setCanceled(true);
-		
-						// can't mine/attack while reloading
+
 					} else if (ShooterValues.getReloadtime(ClientProxy.get().getPlayerClient(), false) > 0) {
 						long diff = ShooterValues.getReloadtime(ClientProxy.get().getPlayerClient(), false) - System.currentTimeMillis();
 						if (diff > 0) {
@@ -121,31 +119,16 @@ public class TGEventHandler {
 								event.setCanceled(true);
 							}
 						}
-		
+
 					}
-				} /*else if (event.getButton() == 1 && !GunManager.canUseOffhand(ply)) {
-					if(!ply.getHeldItemMainhand().isEmpty()&&ply.getHeldItemMainhand().getItem() instanceof GenericGunCharge) {
-						//Charging gun is allowed
-					} else if (!ply.getHeldItemMainhand().isEmpty() && ply.getHeldItemMainhand().getItem() instanceof GenericGun){
-						GenericGun g = (GenericGun) ply.getHeldItemMainhand().getItem();
-						
-						//Cancel and call secondary action
-						if (!ply.isSneaking() && event.isButtonstate()) {
-							boolean use = g.gunSecondaryAction(ply, ply.getHeldItemMainhand());
-							event.setCanceled(use);
-						}
-					
-					}
-					
-				} */ else if (event.getButton() == 1 && !ply.isSneaking() && !ply.getHeldItemOffhand().isEmpty() && ply.getHeldItemOffhand().getItem() instanceof IGenericGun && GunManager.canUseOffhand(ply)) {
-					
+				} else if (event.getButton() == 1 && !ply.isSneaking() && !ply.getHeldItemOffhand().isEmpty() && ply.getHeldItemOffhand().getItem() instanceof IGenericGun && GunManager.canUseOffhand(ply)) {
+
 					ClientProxy cp = ClientProxy.get();
-					
+
 					if (((IGenericGun) ply.getHeldItemOffhand().getItem()).isShootWithLeftClick()) {
 						cp.keyFirePressedOffhand = event.isButtonstate();
 						event.setCanceled(true);
-		
-						// can't mine/attack while reloading
+
 					} else if (ShooterValues.getReloadtime(ClientProxy.get().getPlayerClient(), true) > 0) {
 						long diff = ShooterValues.getReloadtime(ClientProxy.get().getPlayerClient(), true) - System.currentTimeMillis();
 						if (diff > 0) {
@@ -153,21 +136,20 @@ public class TGEventHandler {
 								event.setCanceled(true);
 							}
 						}
-		
+
 					}
-					
-				//Lock On Weapon
+
 				} else if (event.getButton() == 1 && ply.getHeldItemMainhand().getItem() instanceof GenericGunCharge && ((GenericGunCharge)ply.getHeldItemMainhand().getItem()).getLockOnTicks() > 0) {
 					TGExtendedPlayer props = TGExtendedPlayer.get(ply);
 					props.lockOnEntity = null;
 					props.lockOnTicks = -1;
 				}
-				
+
 			}
 		}
 	}
-	
-	
+
+
 	protected static boolean allowOffhandUse(EntityPlayer player, EnumHand hand) {
 		if (hand == EnumHand.MAIN_HAND) return true;
 		if(!player.getHeldItemMainhand().isEmpty() && player.getHeldItemMainhand().getItem() instanceof IGenericGun) {
@@ -182,7 +164,7 @@ public class TGEventHandler {
 		}
 		return true;
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public static void rightClickEvent(PlayerInteractEvent.RightClickItem event) {
 		boolean cancel = !allowOffhandUse(event.getEntityPlayer(), event.getHand());
@@ -190,9 +172,8 @@ public class TGEventHandler {
 			event.setCanceled(true);
 			event.setCancellationResult(EnumActionResult.PASS);
 		}
-		//System.out.println("Right Click Item:"+event.getEntityPlayer()+" "+event.getHand());
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public static void rightClickEvent(PlayerInteractEvent.RightClickBlock event) {
 		boolean cancel = !allowOffhandUse(event.getEntityPlayer(), event.getHand());
@@ -202,15 +183,15 @@ public class TGEventHandler {
 			event.setUseItem(Result.DENY);
 			event.setCancellationResult(EnumActionResult.PASS);
 		} else if (event.getHand() == EnumHand.MAIN_HAND){
-			
+
 			EntityPlayer ply = event.getEntityPlayer();
 			if(ply.isSneaking() && !ply.getHeldItemOffhand().isEmpty() && (ply.getHeldItemOffhand().getItem() instanceof GenericGun) && (!event.getItemStack().isEmpty() && !(event.getItemStack().getItem() instanceof GenericGun)) ) {
 				event.setUseBlock(Result.ALLOW);
 			}
-			
+
 		}
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public static void rightClickEvent(PlayerInteractEvent.EntityInteract event) {
 		boolean cancel = !allowOffhandUse(event.getEntityPlayer(), event.getHand());
@@ -218,106 +199,104 @@ public class TGEventHandler {
 			event.setCanceled(true);
 			event.setCancellationResult(EnumActionResult.PASS);
 		}
-		//System.out.println("EntityInteract:"+event.getEntityPlayer()+" "+event.getHand());
 	}
-	
-	
+
+
 	@SideOnly(Side.CLIENT)
-	@SubscribeEvent(priority=EventPriority.LOW) //set to low so other mods don't accidentally destroy it easily
+	@SubscribeEvent(priority=EventPriority.LOW)
 	public static void handleFovEvent(FOVUpdateEvent event){
 
 		float f = 1.0f;
 		if ( TGConfig.cl_lockSpeedFov){
 			IAttributeInstance iattributeinstance = event.getEntity().getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
-        	f = 1/ ((float)(((iattributeinstance.getAttributeValue() / (double)event.getEntity().capabilities.getWalkSpeed() + 1.0D) / 2.0D)));
-        	
-        	if(ClientProxy.get().getPlayerClient().isSprinting()){
-        		f*=TGConfig.cl_fixedSprintFov;
-        	}
+			f = 1/ ((float)(((iattributeinstance.getAttributeValue() / (double)event.getEntity().capabilities.getWalkSpeed() + 1.0D) / 2.0D)));
+
+			if(ClientProxy.get().getPlayerClient().isSprinting()){
+				f*=TGConfig.cl_fixedSprintFov;
+			}
 		}
-		event.setNewfov(event.getNewfov()*ClientProxy.get().player_zoom*f);//*speedFOV;
+		event.setNewfov(event.getNewfov()*ClientProxy.get().player_zoom*f);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onRenderLivingEventPre(RenderLivingEvent.Pre event){
 		if (event.getEntity() instanceof EntityPlayer) {
 			EntityPlayer ply = (EntityPlayer) event.getEntity();
-			
-		 	ItemStack stack =ply.getHeldItemMainhand();
-		 	if(!stack.isEmpty() && stack.getItem() instanceof GenericGun && ((GenericGun) stack.getItem()).hasBowAnim()){
-		 		ModelBase mdl = event.getRenderer().getMainModel();
-		 		if (mdl instanceof ModelPlayer) {
-			 		ModelPlayer model = (ModelPlayer) mdl;
-			 		if (ply.getPrimaryHand()==EnumHandSide.RIGHT) {
-			 			model.rightArmPose = ArmPose.BOW_AND_ARROW;
-			 		} else {
-			 			model.leftArmPose = ArmPose.BOW_AND_ARROW;
-			 		}
-		 		}
-		 	} else {
-		 	
-			 	ItemStack stack2 =ply.getHeldItemOffhand();
-			 	if(!stack2.isEmpty() && stack2.getItem() instanceof GenericGun && ((GenericGun) stack2.getItem()).hasBowAnim()){
-			 		ModelBase mdl = event.getRenderer().getMainModel();
-			 		if (mdl instanceof ModelPlayer) {
-				 		ModelPlayer model = (ModelPlayer) mdl;
-				 		
-				 		if (ShooterValues.getIsCurrentlyUsingGun(ply,true)){
-					 		
-					 		if (ply.getPrimaryHand()==EnumHandSide.RIGHT) {
-					 			model.leftArmPose = ArmPose.BOW_AND_ARROW;
-					 		} else {
-					 			model.rightArmPose = ArmPose.BOW_AND_ARROW;
-					 		}
-				 		}
-			 		}
-			 	}
-		 	}
+
+			ItemStack stack =ply.getHeldItemMainhand();
+			if(!stack.isEmpty() && stack.getItem() instanceof GenericGun && ((GenericGun) stack.getItem()).hasBowAnim()){
+				ModelBase mdl = event.getRenderer().getMainModel();
+				if (mdl instanceof ModelPlayer) {
+					ModelPlayer model = (ModelPlayer) mdl;
+					if (ply.getPrimaryHand()==EnumHandSide.RIGHT) {
+						model.rightArmPose = ArmPose.BOW_AND_ARROW;
+					} else {
+						model.leftArmPose = ArmPose.BOW_AND_ARROW;
+					}
+				}
+			} else {
+
+				ItemStack stack2 =ply.getHeldItemOffhand();
+				if(!stack2.isEmpty() && stack2.getItem() instanceof GenericGun && ((GenericGun) stack2.getItem()).hasBowAnim()){
+					ModelBase mdl = event.getRenderer().getMainModel();
+					if (mdl instanceof ModelPlayer) {
+						ModelPlayer model = (ModelPlayer) mdl;
+
+						if (ShooterValues.getIsCurrentlyUsingGun(ply,true)){
+
+							if (ply.getPrimaryHand()==EnumHandSide.RIGHT) {
+								model.leftArmPose = ArmPose.BOW_AND_ARROW;
+							} else {
+								model.rightArmPose = ArmPose.BOW_AND_ARROW;
+							}
+						}
+					}
+				}
+			}
 		}
-		
-		/*
-		 * ENTITY DEATH EFFECTS
-		 */
+
 		ClientProxy cp = ClientProxy.get();
 		DeathType dt = cp.getEntityDeathType(event.getEntity());
 		switch (dt) {
-		case GORE:
-			event.setCanceled(true);
-			break;
-		case DISMEMBER:
-		case BIO:
-		case LASER:
-			event.setCanceled(true);
-			DeathEffectEntityRenderer.doRender(event.getRenderer(), event.getEntity(), event.getX(), event.getY(), event.getZ(), 0f, dt);
-			break;
-		case DEFAULT:
-		default:
-			break;
+			case GORE:
+				event.setCanceled(true);
+				break;
+			case DISMEMBER:
+			case BIO:
+			case LASER:
+				event.setCanceled(true);
+				DeathEffectEntityRenderer.doRender(event.getRenderer(), event.getEntity(), event.getX(), event.getY(), event.getZ(), 0f, dt);
+				break;
+			case DEFAULT:
+			default:
+				break;
 		}
-		
+
 	}
-	
-	@SubscribeEvent(priority=EventPriority.HIGH)
+
+	// --- ПРАВИЛЬНЕ ВИРІШЕННЯ КОНФЛІКТУ: ЗМІНЕНО ПРІОРИТЕТ З HIGH НА LOWEST ---
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public static void OnLivingAttack(LivingAttackEvent event){
 		if (event.getSource() instanceof TGDamageSource) {
 			event.setCanceled(true);
 			try {
 				DamageSystem.attackEntityFrom(event.getEntityLiving(), event.getSource(), event.getAmount());
-				
+
 			} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		} else if ( (event.getSource() == DamageSource.LAVA || event.getSource()==DamageSource.ON_FIRE || event.getSource()==DamageSource.IN_FIRE) && event.getEntityLiving() instanceof EntityPlayer) {
 			float bonus = GenericArmor.getArmorBonusForPlayer((EntityPlayer) event.getEntityLiving(), TGArmorBonus.COOLING_SYSTEM,event.getEntityLiving().world.getTotalWorldTime()%5==0);
-			
+
 			if (bonus >=1.0f) {
 				event.setCanceled(true);
 			}
 		}
 	}
-	
-	@SubscribeEvent(priority=EventPriority.HIGH)
+
+	// --- ПРАВИЛЬНЕ ВИРІШЕННЯ КОНФЛІКТУ: ЗМІНЕНО ПРІОРИТЕТ З HIGH НА LOWEST ---
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	public static void onLivingHurt(LivingHurtEvent event) {
 		if(event.getEntity() instanceof INpcTGDamageSystem) {
 			event.setCanceled(true);
@@ -332,34 +311,34 @@ public class TGEventHandler {
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onLivingJumpEvent(LivingJumpEvent event)
 	{
-	    if (event.getEntity() instanceof EntityPlayer)
-	    {
-	        EntityPlayer ply = (EntityPlayer) event.getEntity();
-	        float jumpbonus = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.JUMP,true);
+		if (event.getEntity() instanceof EntityPlayer)
+		{
+			EntityPlayer ply = (EntityPlayer) event.getEntity();
+			float jumpbonus = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.JUMP,true);
 
 			ply.motionY+=jumpbonus;
-	    }  
+		}
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onLivingFallEvent(LivingFallEvent event)
 	{
-	    if (event.getEntity() instanceof EntityPlayer)
-	    {	
-	    	boolean consume= event.getDistance()>3.0f;
-	    	
-	        EntityPlayer ply = (EntityPlayer) event.getEntity();
-	        float fallbonus = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.FALLDMG,consume);
-	        float reduction = (fallbonus <1 ? 1-fallbonus : 0.0f);
-	        float freeheight = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.FREEHEIGHT,false);
-	        if(freeheight<event.getDistance()){
-	        	event.setDistance(event.getDistance() - freeheight);
-	        } else {
-	        	event.setDistance(0.0f);
-	        }
-	        
-	        event.setDistance(event.getDistance() * reduction);
-	    }  
+		if (event.getEntity() instanceof EntityPlayer)
+		{
+			boolean consume= event.getDistance()>3.0f;
+
+			EntityPlayer ply = (EntityPlayer) event.getEntity();
+			float fallbonus = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.FALLDMG,consume);
+			float reduction = (fallbonus <1 ? 1-fallbonus : 0.0f);
+			float freeheight = GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.FREEHEIGHT,false);
+			if(freeheight<event.getDistance()){
+				event.setDistance(event.getDistance() - freeheight);
+			} else {
+				event.setDistance(0.0f);
+			}
+
+			event.setDistance(event.getDistance() * reduction);
+		}
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -392,8 +371,8 @@ public class TGEventHandler {
 			}
 		}
 	}
-	
-	
+
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onBreakEvent(BreakSpeed event){
 		EntityPlayer ply = event.getEntityPlayer();
@@ -402,10 +381,10 @@ public class TGEventHandler {
 		if(ply.isInsideOfMaterial(Material.WATER)  || ply.isInsideOfMaterial(Material.LAVA)){
 			waterbonus += GenericArmor.getArmorBonusForPlayer(ply, TGArmorBonus.BREAKSPEED_WATER,true);
 		}
-		
+
 		event.setNewSpeed(event.getNewSpeed()*bonus*waterbonus);
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onLivingDeathEvent(LivingDeathEvent event){
 		EntityLivingBase entity = event.getEntityLiving();
@@ -417,13 +396,12 @@ public class TGEventHandler {
 				tgplayer.lastSaturation=0;
 				tgplayer.addRadiation(-TGRadiationSystem.RADLOST_ON_DEATH);
 			}
-			
+
 			if (event.getSource() instanceof TGDamageSource) {
 				TGDamageSource tgs = (TGDamageSource)event.getSource();
 				if (tgs.deathType != DeathType.DEFAULT) {
 					if(Math.random()<tgs.goreChance) {
 						if (EntityDeathUtils.hasSpecialDeathAnim(entity, tgs.deathType)) {
-							//System.out.println("Send packet!");
 							TGPackets.wrapper.sendToAllAround(new PacketEntityDeathType(entity, tgs.deathType), TGPackets.targetPointAroundEnt(entity, 100.0f));
 						}
 					}
@@ -446,20 +424,19 @@ public class TGEventHandler {
 				}
 
 			} else if (event.getEntity() instanceof TGDummySpawn){
-				//
 				TGSpawnManager.handleSpawn(event.getWorld(), event.getEntity());
 				event.setCanceled(true);
 			}
 		}
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onStartTracking(PlayerEvent.StartTracking event){
 		if(event.getEntityPlayer().world.isRemote){
 			TGPackets.wrapper.sendToServer(new PacketRequestTGPlayerSync(event.getEntityPlayer()));
 		}
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onStopTracking(PlayerEvent.StopTracking event){
 		if(event.getEntityPlayer().world.isRemote){
@@ -470,7 +447,7 @@ public class TGEventHandler {
 			}
 		}
 	}
-		
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onTextureStitch(TextureStitchEvent event) {
@@ -480,7 +457,7 @@ public class TGEventHandler {
 		event.getMap().registerSprite(SlotTG.FOODSLOT_TEX);
 		event.getMap().registerSprite(SlotTG.HEALSLOT_TEX);
 		event.getMap().registerSprite(SlotTG.AMMOSLOT_TEX);
-		
+
 		event.getMap().registerSprite(SlotTG.AMMOEMPTYSLOT_TEX);
 		event.getMap().registerSprite(SlotTG.BOTTLESLOT_TEX);
 		event.getMap().registerSprite(SlotTG.TURRETGUNSLOT_TEX);
@@ -489,10 +466,10 @@ public class TGEventHandler {
 		event.getMap().registerSprite(SlotFabricator.FABRICATOR_SLOTTEX_WIRES);
 		event.getMap().registerSprite(SlotFabricator.FABRICATOR_SLOTTEX_POWDER);
 		event.getMap().registerSprite(SlotFabricator.FABRICATOR_SLOTTEX_PLATE);
-		
+
 		event.getMap().registerSprite(SlotTG.INGOTSLOT_TEX);
 		event.getMap().registerSprite(SlotTG.INGOTDARKSLOT_TEX);
-		
+
 		RenderDoor3x3Fast.stitchTextures(event.getMap());
 	}
 
@@ -510,23 +487,23 @@ public class TGEventHandler {
 		float t = 1.0f;
 		EntityPlayer ply = ClientProxy.get().getPlayerClient();
 		ItemStack stack = ply.getActiveItemStack();
-		
+
 		if(!stack.isEmpty() && ((stack.getItem() instanceof GenericGunCharge && ((GenericGunCharge)stack.getItem()).hasRightClickAction()) || stack.getItem() instanceof GenericGrenade)) {
 			EnumHand hand = ply.getActiveHand();
 
 			ItemRenderer itemrenderer = Minecraft.getMinecraft().getItemRenderer();
 			try {
-                if (hand == EnumHand.MAIN_HAND) {
-                    if (itemrenderer.equippedProgressMainHand < t) {
-                        itemrenderer.equippedProgressMainHand = t;
-                        itemrenderer.prevEquippedProgressMainHand = t;
-                    }
-                } else {
-                    if (itemrenderer.equippedProgressOffHand < t) {
-                        itemrenderer.equippedProgressOffHand = t;
-                        itemrenderer.prevEquippedProgressOffHand = t;
-                    }
-                }
+				if (hand == EnumHand.MAIN_HAND) {
+					if (itemrenderer.equippedProgressMainHand < t) {
+						itemrenderer.equippedProgressMainHand = t;
+						itemrenderer.prevEquippedProgressMainHand = t;
+					}
+				} else {
+					if (itemrenderer.equippedProgressOffHand < t) {
+						itemrenderer.equippedProgressOffHand = t;
+						itemrenderer.prevEquippedProgressOffHand = t;
+					}
+				}
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}
@@ -534,7 +511,7 @@ public class TGEventHandler {
 		}
 
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onRenderWorldLast(RenderWorldLastEvent event) {
@@ -547,19 +524,19 @@ public class TGEventHandler {
 		GlStateManager.disableLighting();
 		OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 0, 240f);
 	}
-	
+
 	@SubscribeEvent
 	public static void onCraftEvent(ItemCraftedEvent event) {
 		if(event.crafting.getItem() instanceof GenericGun) {
 			boolean hasGun=false;
 			boolean hasAmmo=false;
 			boolean hasInvalid=false;
-			
+
 			ItemStack gun=ItemStack.EMPTY;
-			
+
 			for(int i=0; i<event.craftMatrix.getSizeInventory();i++) {
 				ItemStack stack = event.craftMatrix.getStackInSlot(i);
-				
+
 				if(!stack.isEmpty()) {
 					if( stack.getItem() instanceof GenericGun) {
 						if(!hasGun) {
@@ -576,7 +553,7 @@ public class TGEventHandler {
 							hasInvalid=true;
 							break;
 						}
-						
+
 					} else {
 						hasInvalid=true;
 						break;
@@ -584,7 +561,6 @@ public class TGEventHandler {
 				}
 			}
 			if(!hasInvalid && hasGun && hasAmmo) {
-				//Was an Ammo change recipe!
 				GenericGun g = (GenericGun) gun.getItem();
 				List<ItemStack> items = g.getAmmoOnUnload(gun);
 				items.forEach(i -> {
@@ -593,28 +569,28 @@ public class TGEventHandler {
 						ItemStack it = i.copy();
 						it.setCount(amount);
 						event.player.world.spawnEntity(new EntityItem(event.player.world, event.player.posX, event.player.posY, event.player.posZ, it));
-					}		
-					});
+					}
+				});
 			}
-			
+
 		}
 
-		
+
 	}
-	
+
 	@SubscribeEvent(priority=EventPriority.NORMAL)
 	public static void onPlayerDrops(PlayerDropsEvent event){
 		EntityPlayer ply = event.getEntityPlayer();
 		TGExtendedPlayer props = TGExtendedPlayer.get(ply);
-		
+
 		if(props!=null){
 
 			props.dropInventory(ply);
 
-		}	
-		
+		}
+
 	}
-	
+
 	public static Method Block_getSilkTouchDrop = ReflectionHelper.findMethod(Block.class, "getSilkTouchDrop", "func_180643_i", IBlockState.class);
 
 	@SubscribeEvent
@@ -625,13 +601,13 @@ public class TGEventHandler {
 			if(!stack.isEmpty() && stack.getItem() instanceof MiningDrill && ply.isSneaking()) {
 				IBlockState state = event.getState();
 				if (state.getBlock().canSilkHarvest(ply.world, event.getPos(), state, ply)){
-				
+
 					MiningDrill md = (MiningDrill) stack.getItem();
 					if (md.getAmmoLeft(stack)>0) {
-						
+
 						List<ItemStack> drops = event.getDrops();
 						drops.clear();
-						
+
 						try {
 							drops.add((ItemStack) Block_getSilkTouchDrop.invoke(state.getBlock(), state));
 						} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
@@ -643,10 +619,9 @@ public class TGEventHandler {
 				}
 			}
 		}
-		
+
 	}
-	
-	//stop XP drop on silk harvesting with mining drill
+
 	@SubscribeEvent(priority=EventPriority.HIGH)
 	public static void onBlockBreakEvent(BlockEvent.BreakEvent event) {
 		EntityPlayer ply = event.getPlayer();
@@ -657,8 +632,8 @@ public class TGEventHandler {
 			}
 		}
 	}
-	
-	@SubscribeEvent(priority=EventPriority.HIGH) //run before regular drop events
+
+	@SubscribeEvent(priority=EventPriority.HIGH)
 	public static void MilitaryCrateDrops(HarvestDropsEvent event) {
 		IBlockState state = event.getState();
 
@@ -666,19 +641,19 @@ public class TGEventHandler {
 			EntityPlayer ply = event.getHarvester();
 			if (ply!=null) {
 				int fortune = event.getFortuneLevel();
-						
+
 				LootTable loottable = ply.world.getLootTableManager().getLootTableFromLocation(TGBlocks.MILITARY_CRATE.getLootableForState(state));
 				LootContext lootcontext = new LootContext.Builder((WorldServer) ply.world).withLuck(fortune).withPlayer(ply).build();
-				
+
 				event.getDrops().clear();
 				for (ItemStack itemstack : loottable.generateLootForPools(ply.world.rand, lootcontext))
-	            {
+				{
 					event.getDrops().add(itemstack);
-	            }
+				}
 			}
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public static void onBlockHighlight(DrawBlockHighlightEvent event) {
@@ -699,11 +674,11 @@ public class TGEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onItemSwitch(LivingEquipmentChangeEvent event) {
 		if (event.getSlot()==EntityEquipmentSlot.MAINHAND || event.getSlot()==EntityEquipmentSlot.OFFHAND) {
-			
+
 			boolean fromEffect=false;
 			boolean toEffect =false;
 			if (!event.getTo().isEmpty() && event.getTo().getItem() instanceof GenericGun) {
@@ -716,7 +691,7 @@ public class TGEventHandler {
 					fromEffect=true;
 				}
 			}
-			
+
 			if(fromEffect||toEffect){
 				EnumHand hand = EnumHand.MAIN_HAND;
 				if (event.getSlot()==EntityEquipmentSlot.OFFHAND) {
@@ -724,10 +699,10 @@ public class TGEventHandler {
 				}
 				TGPackets.wrapper.sendToDimension(new PacketNotifyAmbientEffectChange(event.getEntityLiving(), hand), event.getEntityLiving().world.provider.getDimension());
 			}
-			 
+
 		}
 	}
-	
+
 	@Optional.Method(modid="albedo")
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
@@ -737,7 +712,7 @@ public class TGEventHandler {
 			event.add(cp.activeLightPulses.get(i).provideLight());
 		}
 	}
-	
+
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public static void ItemRadiationTooltip(ItemTooltipEvent event) {
@@ -749,7 +724,7 @@ public class TGEventHandler {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void onEntityConstruction(EntityConstructing event) {
 
